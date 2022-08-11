@@ -4,44 +4,43 @@
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
-
+<h2>Questions N Answers Forum</h2>
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="AskQuestion">Ask a question</a>
 </p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Title)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Content)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.User)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Title)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Content)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.User.Id)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+<form asp-action="Index">
+    <select name="sortBy">
+        <option value="sortByDate">Sort by Date</option>
+        <option value="sortByAnswersCount">Sort by Number of Answers</option>
+    </select>
+    <button type="submit">Sort</button>
+</form>
+<hr/>
+<hr/>
+
+<div>
+    @foreach (var question in Model)
+    {
+        <div>
+            <h4>Question</h4>
+            <h5>Title: @question.Title</h5>
+            <h5>By: @question.User.UserName</h5>
+            <p>@question.Content</p>
+            <a asp-action="Details" name="@question.Id"> Details</a>
+            <a asp-action="AddAnswer"> Answer Question</a>
+            <hr/>
+        </div>
+        <div>
+            <h5>Current Answers: @question.Answers.Count</h5>
+            @foreach (var answer in @question.Answers)
+            {
+                <h5> @answer.User.UserName</h5>
+                <p> @answer.Post</p>
+            }
+            <hr/>
+            <hr/>
+        </div>
+
+        
+    }
+</div>

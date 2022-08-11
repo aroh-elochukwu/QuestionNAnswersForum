@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using QuestionNAnswersForum.Data;
 using QuestionNAnswersForum.Models;
+using QuestionNAnswersForum.Models.ViewModels;
 
 namespace QuestionNAnswersForum.Controllers
 {
@@ -25,10 +26,31 @@ namespace QuestionNAnswersForum.Controllers
         }
 
         // GET: Questions
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string? sortOrder)
         {
-            var applicationDbContext = _context.Question.Include(q => q.User).Include(r => r.Answers);
-            return View(await applicationDbContext.ToListAsync());
+            
+            IQueryable <Question> questions =  _context.Question.Include(r => r.User).Include(r => r.Answers);
+
+            switch (sortOrder)
+            {
+                case " ":
+                    questions = questions.OrderByDescending(r => r.DateAsked);
+                    break;
+                case "sortByDate":
+                    questions = questions.OrderByDescending(r => r.DateAsked);
+                    return View("Index");
+                    break;
+                case "SortByAnswersCount":
+                    questions = questions.OrderByDescending(r => r.Answers.Count);
+                    return View ("Index");
+                    break;
+                default:
+                    questions = questions.OrderByDescending(r => r.DateAsked);
+                    break;
+            }
+
+            return View(questions.ToList());
+            
         }
 
         // GET: Questions/Details/5
@@ -51,7 +73,7 @@ namespace QuestionNAnswersForum.Controllers
         }
 
         // GET: Questions/Create
-        public IActionResult Create()
+        public IActionResult AskQuestion()
         {
             ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id");
             return View();
@@ -62,16 +84,57 @@ namespace QuestionNAnswersForum.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,Content,UserId")] Question question)
+        public async Task<IActionResult> AskQuestion(string? title, string content)
         {
-            if (ModelState.IsValid)
+            string userName = User.Identity.Name;
+            ApplicationUser user = await _userManager.FindByNameAsync(userName);
+            Question newQuestion = new Question();
+            if (title != null && content != null)
             {
-                _context.Add(question);
+                newQuestion.Title = title;
+                newQuestion.Content = content;
+                newQuestion.DateAsked = DateTime.Now;
+                newQuestion.User = user;
+                user.Questions.Add(newQuestion);
+                _context.Question.Add(newQuestion);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Index");
             }
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", question.UserId);
-            return View(question);
+
+
+            return RedirectToAction("Index");
+        }
+
+        public IActionResult AddAnswer()
+        {
+            QuestionsSelectViewModel vm = new QuestionsSelectViewModel(_context.Question.ToList());
+
+            return View(vm);
+
+
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddAnswer(int? questionId, string post)
+        {
+            string UserName = User.Identity.Name;
+            ApplicationUser user = await _userManager.FindByNameAsync(UserName);
+            Answer answer = new Answer();
+            Question question = await _context.Question.FirstAsync(q => q.Id == questionId);
+
+            if (post != null && question != null)
+            {
+                answer.Post = post;
+                answer.User = user;
+                question.Answers.Add(answer);
+                _context.Add(answer);
+                await _context.SaveChangesAsync();
+                return RedirectToAction("Index");
+
+            }
+
+            return RedirectToAction("Index");
+
         }
 
         // GET: Questions/Edit/5

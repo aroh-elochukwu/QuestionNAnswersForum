@@ -7,6 +7,9 @@
         public ApplicationUser User { get; set; }
         public string? UserId { get; set; }
         public Question? Question { get; set; }
+        public bool? UpVote { get; set; }
+        public bool? DownVote { get; set; }
+
        
     }
 }

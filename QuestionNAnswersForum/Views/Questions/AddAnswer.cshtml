@@ -1,0 +1,19 @@
+﻿@using QuestionNAnswersForum.Models.ViewModels
+@model QuestionsSelectViewModel
+
+<h2> Add an answer</h2>
+<hr />
+<hr/>
+
+<form asp-action="AddAnswer" method="post">
+
+    <h4>Choose Question to answer</h4>
+    <select name="QuestionId" asp-items="Model.QuestionSelect"></select>
+    <textarea name="Post"></textarea>
+
+
+    <button type="submit">Submit Answer</button>
+    
+
+    
+</form>

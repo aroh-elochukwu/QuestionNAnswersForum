@@ -11,5 +11,6 @@ namespace QuestionNAnswersForum.Data
         {
         }
         public DbSet<QuestionNAnswersForum.Models.Question>? Question { get; set; }
+        public DbSet<QuestionNAnswersForum.Models.Answer>? Answer { get; set; }
     }
 }

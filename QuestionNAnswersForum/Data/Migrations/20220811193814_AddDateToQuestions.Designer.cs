@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using QuestionNAnswersForum.Data;
 
@@ -11,9 +12,10 @@ using QuestionNAnswersForum.Data;
 namespace QuestionNAnswersForum.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220811193814_AddDateToQuestions")]
+    partial class AddDateToQuestions
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -167,18 +169,12 @@ namespace QuestionNAnswersForum.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<bool?>("DownVote")
-                        .HasColumnType("bit");
-
                     b.Property<string>("Post")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("QuestionId")
                         .HasColumnType("int");
-
-                    b.Property<bool?>("UpVote")
-                        .HasColumnType("bit");
 
                     b.Property<string>("UserId")
                         .HasColumnType("nvarchar(450)");
@@ -257,31 +253,6 @@ namespace QuestionNAnswersForum.Data.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("QuestionNAnswersForum.Models.Comment", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Post")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("QuestionId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("QuestionId");
-
-                    b.ToTable("Comment");
-                });
-
             modelBuilder.Entity("QuestionNAnswersForum.Models.Question", b =>
                 {
                     b.Property<int>("Id")
@@ -294,18 +265,12 @@ namespace QuestionNAnswersForum.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("DateAsked")
+                    b.Property<DateTime>("DateTime")
                         .HasColumnType("datetime2");
-
-                    b.Property<bool?>("DownVote")
-                        .HasColumnType("bit");
 
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool?>("UpVote")
-                        .HasColumnType("bit");
 
                     b.Property<string>("UserId")
                         .HasColumnType("nvarchar(450)");
@@ -383,17 +348,6 @@ namespace QuestionNAnswersForum.Data.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("QuestionNAnswersForum.Models.Comment", b =>
-                {
-                    b.HasOne("QuestionNAnswersForum.Models.Question", "Question")
-                        .WithMany("Comments")
-                        .HasForeignKey("QuestionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Question");
-                });
-
             modelBuilder.Entity("QuestionNAnswersForum.Models.Question", b =>
                 {
                     b.HasOne("QuestionNAnswersForum.Models.ApplicationUser", "User")
@@ -413,8 +367,6 @@ namespace QuestionNAnswersForum.Data.Migrations
             modelBuilder.Entity("QuestionNAnswersForum.Models.Question", b =>
                 {
                     b.Navigation("Answers");
-
-                    b.Navigation("Comments");
                 });
 #pragma warning restore 612, 618
         }

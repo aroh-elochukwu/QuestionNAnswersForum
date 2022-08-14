@@ -10,6 +10,7 @@
         public ICollection<Answer> Answers { get; set; } = new HashSet<Answer>();
         public DateTime DateAsked { get; set; }   
         public ICollection<Comment> Comments { get; set; } = new HashSet<Comment>();
+        public ICollection<Tag>? Tags { get; set; } = new HashSet<Tag>();
         public bool? UpVote { get; set; }
         public bool? DownVote { get; set; }
        

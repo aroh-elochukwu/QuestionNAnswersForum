@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using QuestionNAnswersForum.Data;
 
@@ -11,9 +12,10 @@ using QuestionNAnswersForum.Data;
 namespace QuestionNAnswersForum.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220813225452_AddDateCreatedToAnswerModel")]
+    partial class AddDateCreatedToAnswerModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -268,8 +270,8 @@ namespace QuestionNAnswersForum.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int?>("AnswerId")
-                        .HasColumnType("int");
+                    b.Property<string>("ApplicationUserId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
@@ -278,21 +280,16 @@ namespace QuestionNAnswersForum.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("QuestionId")
+                    b.Property<int>("QuestionId")
                         .HasColumnType("int");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AnswerId");
+                    b.HasIndex("ApplicationUserId");
 
                     b.HasIndex("QuestionId");
 
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Comments");
+                    b.ToTable("Comment");
                 });
 
             modelBuilder.Entity("QuestionNAnswersForum.Models.Question", b =>
@@ -328,51 +325,6 @@ namespace QuestionNAnswersForum.Data.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Question");
-                });
-
-            modelBuilder.Entity("QuestionNAnswersForum.Models.QuestionTagBar", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<int?>("QuestionId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("TagId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("QuestionId");
-
-                    b.HasIndex("TagId");
-
-                    b.ToTable("QuestionTags");
-                });
-
-            modelBuilder.Entity("QuestionNAnswersForum.Models.Tag", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<int?>("QuestionId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("QuestionId");
-
-                    b.ToTable("Tags");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -445,23 +397,17 @@ namespace QuestionNAnswersForum.Data.Migrations
 
             modelBuilder.Entity("QuestionNAnswersForum.Models.Comment", b =>
                 {
-                    b.HasOne("QuestionNAnswersForum.Models.Answer", "Answer")
-                        .WithMany()
-                        .HasForeignKey("AnswerId");
+                    b.HasOne("QuestionNAnswersForum.Models.ApplicationUser", null)
+                        .WithMany("Comments")
+                        .HasForeignKey("ApplicationUserId");
 
                     b.HasOne("QuestionNAnswersForum.Models.Question", "Question")
                         .WithMany("Comments")
-                        .HasForeignKey("QuestionId");
-
-                    b.HasOne("QuestionNAnswersForum.Models.ApplicationUser", "User")
-                        .WithMany("Comments")
-                        .HasForeignKey("UserId");
-
-                    b.Navigation("Answer");
+                        .HasForeignKey("QuestionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Question");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("QuestionNAnswersForum.Models.Question", b =>
@@ -471,28 +417,6 @@ namespace QuestionNAnswersForum.Data.Migrations
                         .HasForeignKey("UserId");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("QuestionNAnswersForum.Models.QuestionTagBar", b =>
-                {
-                    b.HasOne("QuestionNAnswersForum.Models.Question", "Question")
-                        .WithMany()
-                        .HasForeignKey("QuestionId");
-
-                    b.HasOne("QuestionNAnswersForum.Models.Tag", "Tag")
-                        .WithMany()
-                        .HasForeignKey("TagId");
-
-                    b.Navigation("Question");
-
-                    b.Navigation("Tag");
-                });
-
-            modelBuilder.Entity("QuestionNAnswersForum.Models.Tag", b =>
-                {
-                    b.HasOne("QuestionNAnswersForum.Models.Question", null)
-                        .WithMany("Tags")
-                        .HasForeignKey("QuestionId");
                 });
 
             modelBuilder.Entity("QuestionNAnswersForum.Models.ApplicationUser", b =>
@@ -509,8 +433,6 @@ namespace QuestionNAnswersForum.Data.Migrations
                     b.Navigation("Answers");
 
                     b.Navigation("Comments");
-
-                    b.Navigation("Tags");
                 });
 #pragma warning restore 612, 618
         }

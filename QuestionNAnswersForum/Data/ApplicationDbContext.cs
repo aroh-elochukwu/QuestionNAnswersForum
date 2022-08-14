@@ -12,5 +12,8 @@ namespace QuestionNAnswersForum.Data
         }
         public DbSet<QuestionNAnswersForum.Models.Question>? Question { get; set; }
         public DbSet<QuestionNAnswersForum.Models.Answer>? Answer { get; set; }
+        public DbSet<QuestionNAnswersForum.Models.Comment>? Comments { get; set; }
+        public DbSet<Tag> Tags { get; set; }
+        public DbSet<QuestionTagBar> QuestionTags { get; set; }
     }
 }
